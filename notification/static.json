@@ -1,0 +1,19 @@
+{
+  "css": {
+    "/notification/style/notification.css": "notificationCss"
+  },
+  "js": {
+    "/notification/scripts/routes/notification.js": "notificationRoute",
+    "/notification/scripts/controllers/notification.js": "notificationController"
+  },
+  "moduleDependencies":{
+
+  },
+  "settings": ["/notification/admin-panel-setting.js"],
+  "bodystructure": {
+    "asidebarHook": [],
+    "sidebarHook": [],
+    "headerHook": [],
+    "footerHook":[]
+  }
+}
