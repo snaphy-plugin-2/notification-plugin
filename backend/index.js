@@ -1,5 +1,8 @@
 'use strict';
 module.exports = function( server, databaseObj, helper, packageObj) {
+
+    const remoteMethods = require("./remoteMethods")(server, databaseObj, helper, packageObj);
+
 	/**
 	 * Here server is the main app object
 	 * databaseObj is the mapped database from the package.json file
@@ -14,8 +17,9 @@ module.exports = function( server, databaseObj, helper, packageObj) {
 	 * @return {[type]} [description]
 	 */
 	var init = function(){
-
+        remoteMethods.init();
 	};
+
 
 
 	//return all the methods that you wish to provide user to extend this plugin.
