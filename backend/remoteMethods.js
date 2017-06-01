@@ -88,7 +88,8 @@
                 {
                     description: 'Method to change status of notification to admin panel.',
                     accepts: [
-                        { arg: 'notificationData', type: 'object', required: true}
+                        { arg: 'notificationId', type: 'string', required: true},
+                        { arg: 'status', type: 'string', required: true}
                     ],
                     returns: {
                         arg: 'status', type: 'string', root: true,
@@ -109,10 +110,11 @@
          */
         const changeStatus = function (notificationId, status) {
            return new Promise(function (resolve, reject) {
+               const Notification = databaseObj.Notification;
                status = status?status.trim().toLowerCase() : "";
 
                if(notificationId && status){
-                   var isStatusValid = status.indexOf(["read", "unread"]);
+                   var isStatusValid = ["read", "unread"].indexOf(status);
                    if(isStatusValid === -1){
                        process.nextTick(function () {
                            reject(new Error("Status is invalid."));
@@ -145,7 +147,8 @@
 
 
         return{
-          init: init
+            init: init,
+            sendNotification: sendNotification
         }
     };
 })();

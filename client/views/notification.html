@@ -1,11 +1,12 @@
 <!-- Notifications -->
 <div ng-controller="notificationControl" class="block pull-r-l">
-    <div >
+    <div ng-show="settings.unread.length !== 0">
         <!--UNREAD NOTIFICATION AREA-->
         <div ng-init="loadNotification('unread')" class="block-header bg-gray-lighter">
             <ul class="block-options">
             </ul>
             <h3 class="block-title">UnRead Notification</h3>
+
         </div>
         <div class="block-content">
             <!-- Activity List -->
@@ -13,21 +14,21 @@
                 <li ng-repeat="notification in settings.unread">
                     <i title="mark as read" class="text-success">
                         <label class="css-input css-checkbox css-checkbox-sm css-checkbox-primary">
-                            <input type="checkbox" ><span></span>
+                            <input ng-change="notification.toggleStatus()" ng-model="notification.isChecked" ng-checked="notification.data.status === 'read'" type="checkbox" ><span></span>
                         </label>
                     </i>
-                    <div class="font-w600">{{notification.title}}</div>
-                    <div>{{notification.description}}</div>
-                    <div><small class="text-muted">{{notification.added | elapsed}}</small></div>
+                    <div class="font-w600">{{notification.data.title}}</div>
+                    <div>{{notification.data.description}}</div>
+                    <div><small class="text-muted">{{notification.data.added | elapsed}}</small></div>
                 </li>
             </ul>
             <!-- END Activity List -->
         </div>
     </div><!--END UNREAD NOTIF-->
 
-    <div ng-if="settings.read.length">
+    <div >
         <!--RECENT READ ACTIVITY-->
-        <div  ng-init="loadNotification('read')"  class="block-header bg-gray-lighter">
+        <div ng-show="settings.read.length !== 0" ng-init="loadNotification('read')"  class="block-header bg-gray-lighter">
             <ul class="block-options">
             </ul>
             <h3 class="block-title">RECENT ACTIVITY</h3>
@@ -35,15 +36,15 @@
         <div class="block-content">
             <!-- Activity List -->
             <ul class="list list-activity">
-                <li ng-repeat="notification in settings.read">
-                    <i title="mark as read" class="text-success">
+                <li style="padding-left: 0;" ng-repeat="notification in settings.read">
+                    <!--<i title="mark as read" class="text-success">
                         <label class="css-input css-checkbox css-checkbox-sm css-checkbox-primary">
-                            <input type="checkbox" ><span></span>
+                            <input ng-change="notification.toggleStatus()" ng-model="notification.isChecked" ng-checked="notification.data.status === 'read'" type="checkbox" ><span></span>
                         </label>
-                    </i>
-                    <div class="font-w600">{{notification.title}}</div>
-                    <div>{{notification.description}}</div>
-                    <div><small class="text-muted">{{notification.added | elapsed}}</small></div>
+                    </i>-->
+                    <div class="font-w600">{{notification.data.title}}</div>
+                    <div>{{notification.data.description}}</div>
+                    <div><small class="text-muted">{{notification.data.added | elapsed}}</small></div>
                 </li>
             </ul>
             <!-- END Activity List -->

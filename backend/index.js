@@ -25,5 +25,6 @@ module.exports = function( server, databaseObj, helper, packageObj) {
 	//return all the methods that you wish to provide user to extend this plugin.
 	return {
 		init: init
+        sendNotification: remoteMethods.sendNotification
 	}
 }; //module.exports

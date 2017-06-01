@@ -3,7 +3,7 @@
 angular.module($snaphy.getModuleName())
 //Define your services here..
 
-    .factory('NotificationService', ["Database", "$timeout", function(Database, $timeout) {
+    .factory('NotificationService', ["Database", "$timeout", "$rootScope", function(Database, $timeout, $rootScope, $broadcast) {
 
         /**
          * Load Notification..
@@ -16,23 +16,100 @@ angular.module($snaphy.getModuleName())
             }else{
                 filter = settings.get().options.read.filter;
             }
-            
+
             Notification.find({filter:filter}, function (value, responseHeader) {
                 if(type === "unread"){
                     $timeout(function () {
                         settings.get().unread.length = 0;
-                        angular.copy(value, settings.get().unread);
+                        //angular.copy(value, settings.get().unread);
+                        settings.get().options.unread.total = value.length;
+                        value.forEach(function (notification) {
+                            var obj = initNotification(notification);
+                            //Add a notification..
+                            settings.get().unread.push(obj);
+                        });
+                        $rootScope.$broadcast('setNotification', { unread: settings.get().options.unread.total });
                     }, 0);
 
                 }else{
                     $timeout(function () {
                         settings.get().read.length = 0;
-                        angular.copy(value, settings.get().read);
+                        //angular.copy(value, settings.get().read);
+                        $rootScope.notification.read.total = value.length;
+                        value.forEach(function (notification) {
+                            var obj = initNotification(notification);
+                            //Add a notification..
+                            settings.get().read.push(obj);
+                        });
                     }, 0);
                 }
             }, function (error) {
                console.error(error);
             });
+        };
+
+
+        /**
+         * Initialize notification object
+         * @param notificationObj
+         * @returns {{data: {}, changeStatus: changeStatus, setRead: setRead, setUnRead: setUnRead}}
+         */
+        var initNotification = function (notificationObj) {
+            var notification = {
+                data: {},
+                changeStatus: function (status) {
+                    var  that = this;
+                    var Notification = Database.getDb("notification", "Notification");
+                    var oldStatus = that.status;
+                    if(oldStatus !== that.data.status){
+                        notification.data.status = status;
+                        if(status === "read"){
+                            settings.get().options.unread.total--;
+                        }
+
+                        if(status === "unread"){
+                            settings.get().options.unread.total++;
+                        }
+
+                        if(settings.get().options.unread.total < 0){
+                            settings.get().options.unread.total = 0;
+                        }
+
+                        $rootScope.$broadcast('setNotification', { unread: settings.get().options.unread.total });
+                        Notification.changeStatus({}, {notificationId: that.data.id, status: status},
+                            function (notification) {
+                                //Change status to read..
+                            }, function (error) {
+                                notification.data.status = oldStatus;
+                                $rootScope.$broadcast('setNotification', { unread: settings.get().options.unread.total });
+                            });
+                    }
+
+                },
+                setRead: function () {
+                    this.changeStatus("read");
+                },
+                setUnRead: function () {
+                    this.changeStatus("unread");
+                },
+                toggleStatus: function () {
+                    if(this.data.status === "read"){
+                        this.changeStatus("unread");
+                    }else{
+                        this.changeStatus("read");
+                    }
+                }
+            };
+            if(notificationObj){
+                angular.copy(notificationObj, notification.data);
+                if(notification.data.status === "read"){
+                    notification.isChecked = true;
+                }else{
+                    notification.isChecked = false;
+                }
+
+            }
+            return notification;
         };
 
         /**
@@ -48,7 +125,8 @@ angular.module($snaphy.getModuleName())
                           where:{
                               status:"unread"
                           }
-                      }
+                      },
+                      total: 0
                   },
                   read:{
                       filter:{
@@ -56,7 +134,8 @@ angular.module($snaphy.getModuleName())
                           where:{
                               status:"read"
                           }
-                      }
+                      },
+                      total: 0
                   }
                 },
                 unread:[],
@@ -80,7 +159,7 @@ angular.module($snaphy.getModuleName())
                     return settings;
                 },
                 reset: function(){
-                    settings = initSettings(settings);
+                    settings = initSettings();
                 },
 
                 clear: function(){
