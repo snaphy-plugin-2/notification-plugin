@@ -3,7 +3,8 @@
 angular.module($snaphy.getModuleName())
 //Define your services here..
 
-    .factory('NotificationService', ["Database", "$timeout", "$rootScope", function(Database, $timeout, $rootScope, $broadcast) {
+    .factory('NotificationService', ["Database", "$timeout", "$rootScope", "$window",
+        function(Database, $timeout, $rootScope, $window) {
 
         /**
          * Load Notification..
@@ -17,7 +18,9 @@ angular.module($snaphy.getModuleName())
                 filter = settings.get().options.read.filter;
             }
 
-            Notification.find({filter:filter}, function (value, responseHeader) {
+            const globalNotification = $window.STATIC_DATA.notification;
+            if(globalNotification[type]){
+                var value = globalNotification[type];
                 if(type === "unread"){
                     $timeout(function () {
                         settings.get().unread.length = 0;
@@ -43,9 +46,37 @@ angular.module($snaphy.getModuleName())
                         });
                     }, 0);
                 }
-            }, function (error) {
-               console.error(error);
-            });
+            }else{
+                Notification.find({filter:filter}, function (value, responseHeader) {
+                    if(type === "unread"){
+                        $timeout(function () {
+                            settings.get().unread.length = 0;
+                            //angular.copy(value, settings.get().unread);
+                            settings.get().options.unread.total = value.length;
+                            value.forEach(function (notification) {
+                                var obj = initNotification(notification);
+                                //Add a notification..
+                                settings.get().unread.push(obj);
+                            });
+                            $rootScope.$broadcast('setNotification', { unread: settings.get().options.unread.total });
+                        }, 0);
+
+                    }else{
+                        $timeout(function () {
+                            settings.get().read.length = 0;
+                            //angular.copy(value, settings.get().read);
+                            $rootScope.notification.read.total = value.length;
+                            value.forEach(function (notification) {
+                                var obj = initNotification(notification);
+                                //Add a notification..
+                                settings.get().read.push(obj);
+                            });
+                        }, 0);
+                    }
+                }, function (error) {
+                    console.error(error);
+                });
+            }
         };
 
 
