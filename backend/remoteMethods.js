@@ -55,6 +55,7 @@
          */
         const sendNotification = function (notification) {
            return new Promise(function (resolve, reject) {
+               const Notification = databaseObj.Notification;
                Notification.create(notification)
                    .then(function (data) {
                         resolve(data);
