@@ -3,7 +3,7 @@ module.exports = function( server, databaseObj, helper, packageObj) {
 
 	const Promise       = require("bluebird");
     const remoteMethods = require("./remoteMethods")(server, databaseObj, helper, packageObj);
-
+    //const mongo                = require("mongodb");
 	/**
 	 * Here server is the main app object
 	 * databaseObj is the mapped database from the package.json file
@@ -184,7 +184,7 @@ module.exports = function( server, databaseObj, helper, packageObj) {
                         const patt = /\$user\..+/;
                         if(patt.test(value)){
                             const valueKey = value.replace(/\$user\./, '');
-                            where[key] = user[valueKey].toString();
+                            where[key] = user[valueKey];
                             modifyData = true;
                         }
 					}
