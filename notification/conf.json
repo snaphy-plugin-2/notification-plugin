@@ -3,5 +3,22 @@
   "description": "Plugin to add notification system to snaphy admin panel.",
   "routeExposure": "/notification",
   "activate": true,
+  "filter":{
+    "DepartmentEmployee":{
+      "departmentId": "$user.departmentId",
+      "isDepartment": true
+    },
+    "DepartmentAdmin":{
+      "departmentId": "$user.departmentId",
+      "isDepartment": true
+    },
+    "admin":{
+      "isAdmin": true
+    }
+  },
+  "NOTIFICATION_TYPE":{
+    "read": "read",
+    "unread": "unread"
+  },
   "pluginDependencies": {}
 }
